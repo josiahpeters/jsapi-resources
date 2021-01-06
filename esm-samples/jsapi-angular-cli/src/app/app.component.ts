@@ -11,6 +11,9 @@ import WebMap from '@arcgis/core/WebMap';
 import MapView from '@arcgis/core/views/MapView';
 import Bookmarks from '@arcgis/core/widgets/Bookmarks';
 import Expand from '@arcgis/core/widgets/Expand';
+import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
+import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol';
+import Sketch from '@arcgis/core/widgets/Sketch';
 import config from '@arcgis/core/config.js';
 
 @Component({
@@ -25,6 +28,7 @@ export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('mapViewNode', { static: true }) private mapViewEl: ElementRef;
 
   title = 'ng-cli';
+
 
   constructor(private zone: NgZone) { }
 
@@ -67,8 +71,13 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     this.view = view;
+
+    this.setupSketchWidget(webmap);
+
     return this.view.when();
   }
+
+
 
   ngOnInit(): any {
 
@@ -94,5 +103,23 @@ export class AppComponent implements OnInit, OnDestroy {
       // destroy the map view
       this.view.destroy();
     }
+  }
+
+  setupSketchWidget(map: WebMap): void {
+    const sketchLayer = new GraphicsLayer(
+      {
+        title: 'Shapes'
+      }
+    );
+    map.add(sketchLayer);
+
+    const sketch = new Sketch({
+      layer: sketchLayer,
+      view: this.view,
+      layout: 'vertical',
+      creationMode: 'update',
+    });
+
+    this.view.ui.add(sketch, 'top-right');
   }
 }
